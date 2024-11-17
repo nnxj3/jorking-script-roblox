@@ -1,0 +1,145 @@
+-- Load Rayfield Library
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+-- Create the Window
+local Window = Rayfield:CreateWindow({
+    Name = "Jerk Animation UI",
+    LoadingTitle = "Loading Jerk Animation UI",
+    LoadingSubtitle = "By @xxtroki",
+    ConfigurationSaving = {
+        Enabled = true,
+        FolderName = "JerkAnimationSettings",
+        FileName = "Config"
+    },
+    Discord = {
+        Enabled = false,
+        Invite = "",
+        RememberJoins = false
+    },
+    KeySystem = false -- No key system
+})
+
+-- Create the Tab for Jerk Animation
+local JerkTab = Window:CreateTab("Jerk Animation", 4483362458)
+
+-- Global variables
+getgenv().JERK_OFF_SPEED = 2.5 -- Default speed
+getgenv().JerkOffExecuted = false -- Execution control
+
+local Player = game.Players.LocalPlayer
+local Character = Player.Character or Player.CharacterAdded:Wait()
+local Humanoid = Character:WaitForChild("Humanoid", 1)
+local JerkingOff = false -- State for whether animation is playing
+local jerkoffTrack, closerhandsTrack
+local setToOriginalValues = true
+
+-- Define the animations
+local MAIN_ANIMATIONS = {
+    JERK_OFF = "rbxassetid://99198989",
+    CLOSER_HANDS = "rbxassetid://168086975",
+}
+
+-- Function to start animations
+local function startAnimations()
+    if not Humanoid then return end
+
+    JerkingOff = true
+    setToOriginalValues = true
+    Humanoid.WalkSpeed = 16 -- Keep walk speed for movement
+    Humanoid.JumpPower = 50 -- Keep jump power for movement
+
+    if not jerkoffTrack then
+        local anim1 = Instance.new("Animation")
+        anim1.AnimationId = MAIN_ANIMATIONS.JERK_OFF
+        jerkoffTrack = Humanoid:LoadAnimation(anim1)
+        jerkoffTrack.Looped = true
+        jerkoffTrack:Play()
+        jerkoffTrack:AdjustSpeed(getgenv().JERK_OFF_SPEED)
+    end
+
+    if not closerhandsTrack then
+        local anim2 = Instance.new("Animation")
+        anim2.AnimationId = MAIN_ANIMATIONS.CLOSER_HANDS
+        closerhandsTrack = Humanoid:LoadAnimation(anim2)
+        closerhandsTrack.Looped = true
+        closerhandsTrack:Play()
+        closerhandsTrack:AdjustSpeed(getgenv().JERK_OFF_SPEED)
+    end
+end
+
+-- Function to stop animations and restore default values
+local function stopAnimations()
+    JerkingOff = false
+    setToOriginalValues = false
+    Humanoid.WalkSpeed = 16 -- Reset walk speed to normal after stopping animation
+    Humanoid.JumpPower = 50 -- Reset jump power to normal
+
+    if jerkoffTrack then
+        jerkoffTrack:Stop()
+        jerkoffTrack = nil
+    end
+    if closerhandsTrack then
+        closerhandsTrack:Stop()
+        closerhandsTrack = nil
+    end
+end
+
+-- Toggle to activate or deactivate animations
+JerkTab:CreateToggle({
+    Name = "Activate Jerk Animation",
+    CurrentValue = false,
+    Flag = "JerkAnimationToggle",
+    Callback = function(Value)
+        if Value then
+            startAnimations()
+        else
+            stopAnimations()
+        end
+    end,
+})
+
+-- Input for setting animation speed
+JerkTab:CreateInput({
+    Name = "Animation Speed",
+    PlaceholderText = "Enter speed (e.g., 2.5)",
+    RemoveTextAfterFocusLost = false,
+    Callback = function(Value)
+        local speed = tonumber(Value)
+        if speed and speed > 0 and speed <= 10 then
+            getgenv().JERK_OFF_SPEED = speed
+            if jerkoffTrack then jerkoffTrack:AdjustSpeed(speed) end
+            if closerhandsTrack then closerhandsTrack:AdjustSpeed(speed) end
+        else
+            Rayfield:Notify({
+                Title = "Invalid Input",
+                Content = "Please enter a valid number between 0 and 10.",
+                Duration = 5,
+                Image = 4483362458,
+            })
+        end
+    end,
+})
+
+-- Add Credit and Suggestions
+JerkTab:CreateLabel("Credit to @xxtroki on Discord")
+JerkTab:CreateLabel("If you have any suggestions, DM me!")
+
+-- Automatically reset animations on death
+Player.CharacterAdded:Connect(function()
+    if getgenv().JerkOffExecuted then
+        startAnimations()
+    else
+        stopAnimations()
+    end
+end)
+
+-- Mark as executed
+getgenv().JerkOffExecuted = true
+
+-- Notify that the UI is ready
+Rayfield:Notify({
+    Title = "UI Loaded",
+    Content = "The Jerk Animation UI has been loaded successfully.",
+    Duration = 5,
+    Image = 4483362458,
+})
