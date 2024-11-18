@@ -1,7 +1,5 @@
--- Load Rayfield Library
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
--- Create the Window
 local Window = Rayfield:CreateWindow({
     Name = "Jerk Animation UI",
     LoadingTitle = "Loading Jerk Animation UI",
@@ -19,10 +17,8 @@ local Window = Rayfield:CreateWindow({
     KeySystem = false -- No key system
 })
 
--- Create the Tab for Jerk Animation
 local JerkTab = Window:CreateTab("Jerk Animation", 4483362458)
 
--- Global variables
 getgenv().JERK_OFF_SPEED = 2.5 -- Default speed
 getgenv().JerkOffExecuted = false -- Execution control
 
@@ -33,13 +29,11 @@ local JerkingOff = false -- State for whether animation is playing
 local jerkoffTrack, closerhandsTrack
 local setToOriginalValues = true
 
--- Define the animations
 local MAIN_ANIMATIONS = {
     JERK_OFF = "rbxassetid://99198989",
     CLOSER_HANDS = "rbxassetid://168086975",
 }
 
--- Function to start animations
 local function startAnimations()
     if not Humanoid then return end
 
@@ -67,7 +61,6 @@ local function startAnimations()
     end
 end
 
--- Function to stop animations and restore default values
 local function stopAnimations()
     JerkingOff = false
     setToOriginalValues = false
@@ -84,7 +77,6 @@ local function stopAnimations()
     end
 end
 
--- Toggle to activate or deactivate animations
 JerkTab:CreateToggle({
     Name = "Activate Jerk Animation",
     CurrentValue = false,
@@ -98,7 +90,6 @@ JerkTab:CreateToggle({
     end,
 })
 
--- Input for setting animation speed
 JerkTab:CreateInput({
     Name = "Animation Speed",
     PlaceholderText = "Enter speed (e.g., 2.5)",
@@ -120,11 +111,9 @@ JerkTab:CreateInput({
     end,
 })
 
--- Add Credit and Suggestions
 JerkTab:CreateLabel("Credit to @xxtroki on Discord")
 JerkTab:CreateLabel("If you have any suggestions, DM me!")
 
--- Automatically reset animations on death
 Player.CharacterAdded:Connect(function()
     if getgenv().JerkOffExecuted then
         startAnimations()
@@ -133,10 +122,8 @@ Player.CharacterAdded:Connect(function()
     end
 end)
 
--- Mark as executed
 getgenv().JerkOffExecuted = true
 
--- Notify that the UI is ready
 Rayfield:Notify({
     Title = "UI Loaded",
     Content = "The Jerk Animation UI has been loaded successfully.",
